@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="board">
+	
+	<!-- 전체조회 -->
+	<select id="board_list" resultType="board">
+		select * from board order by ref desc, step asc
+	</select>
+	
+	<!-- 전체 게시물 수 -->
+	<select id="board_row_total" resultType="int">
+		select nvl(count(*),0) from board
+	</select>
+	
+	<!-- 1건 조회 -->
+	<select id="board_one" resultType="board" parameterType="int">
+		select * from board where idx = #{idx}
+	</select>
+	
+	<!-- 삭제 -->
+	<update id="board_delete" parameterType="int">
+		update board set use_state = 'n'
+		where idx = #{idx}
+	</update>
+	
+	<!-- 등록 -->
+	<insert id="board_insert" parameterType="board">
+		insert into board values(seq_board_idx.nextVal, #{ name },#{ m_idx} ,#{ subject },#{ content },#{ ip }, sysdate, 0, 'y', seq_board_idx.currVal, 0, 0)
+	</insert>
+	
+	<!-- 댓글 등록 -->
+	<insert id="board_reply_insert" parameterType="board">
+		insert into board values(seq_board_idx.nextVal, #{ name },#{ m_idx} ,#{ subject },#{ content },#{ ip }, sysdate, 0, 'y', #{ref}, #{step}, #{depth})
+	</insert>
+	
+	<!-- 조회수 증가 -->
+	<update id="board_update_readhit" parameterType="int">
+		update board set readhit = readhit + 1
+		where idx = #{idx}
+	</update>
+	
+	<!-- 기준글 - 스탭 증가 
+		 기준글을 기준으로 댓글 1에 댓글을 추가하면 기존 댓글1의 스탭이 2가된다.
+		 
+		 공간을 만련하기 위해서 스탭을 증가시킨다. -->
+	<update id="board_update_step" parameterType="board">
+		update board set step = step+1
+		where ref = #{ref} and step > #{step}
+	</update>
+	
+	<!-- 수정 -->
+	<update id="board_update" parameterType="board">
+		update board set name = #{ name }, subject = #{ subject }, content = #{ content }, ip = #{ ip }, regdate = sysdate
+		where idx = #{idx}
+	</update>
+	
+	<!-- 조건별 / 페이징별 목록 조회 -->
+	<select id="board_condition_list" resultType="board" parameterType="Map">
+		select *
+		from
+		(
+			select rank() over(order by ref desc, step asc) no, b.* 
+			from (select * from board) b
+		) 
+		where no between #{start} and #{end} 
+	</select>
+</mapper>

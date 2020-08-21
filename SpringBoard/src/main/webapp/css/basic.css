@@ -1,0 +1,30 @@
+@charset "UTF-8";
+
+#box{width: 1280px; margin: 80px auto;}
+
+#box,
+#box a{font-size: 14px; line-height: 18px;}
+
+.inner{width: 600px;}
+#box.inner{width: 600px;}
+.inner-in{width: 400px; margin: 0 auto;}
+
+#box #title{margin: 0 0 80px;}
+
+/* list */
+#box .box{float: right; margin: 0 0 40px; width: 100%; text-align: right;}
+#box .box:after{content: ""; display: inline-block; clear: both; margin: 0;}
+
+#box .joinBox > input {margin: 0 0 0 10px; }
+
+#box .table{clear: both;}
+#box .empty{padding: 80px 0;}
+
+/* insert */
+#box .input-group{margin: 0 0 20px; overflow: hidden;}
+#box .floatL{float: left; width: 85%;}
+#box .floatR{float: right; width: 15%;}
+
+#box .radioBtn{margin: 0 10px;}
+
+.btnBox{text-align: center;}
