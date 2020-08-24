@@ -21,7 +21,7 @@ public class BoardDao {
 	}
 	
 	public List<BoardVo> selectList(Map map) {
-		return sqlSession.selectList("board.board_condition_list",map);
+		return sqlSession.selectList("board.board_condition_list", map);
 	}
 	
 	public BoardVo selectOne(int idx) {
@@ -54,6 +54,10 @@ public class BoardDao {
 
 	public int selectRowTotal() {
 		return sqlSession.selectOne("board.board_row_total");
+	}
+
+	public int selectRowTotal(Map map) {
+		return sqlSession.selectOne("board.board_condition_row_total", map);
 	}
 	
 }

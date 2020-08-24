@@ -42,9 +42,14 @@ public class BoardController {
 	page → int page가 아닌 Integer page로 받는다.
 	page값이 없을 경우 null로 나오기 때문에 
 	객체형인 Integer로 받는다.
+	
+	검색기능 추가로 아래와 같이 들어온다.
+	board/list.do?search=name&search_text=text
 	*/
 	@RequestMapping("/board/list.do")
-	public String list(Integer page, Model model) {
+	/* public String list(Integer page, String search, String search_text, Model model) {
+	   받는 인자가 많을 경우 map으로 받는다. */
+	public String list(Integer page, String search, String search_text, Model model) {
 		
 		//현재 보여질 페이지
 		int nowPage = 1;
@@ -63,17 +68,42 @@ public class BoardController {
 		
 		map.put("start", start);
 		map.put("end", end);
-
-		/*
-		List<BoardVo> totalList = board_dao.selectList();
-		int total = totalList.size();
-		*/
+		
+		/* 검색조건이 null이 아니고, all가 아닌경우 
+		 * 검색조건을 map에 추가한다. */
+		if (search != null && ! search.equals("all")) {
+			
+			/* 이름 + 제목 + 내용 */
+			if (search.equals("name_subject_content")) {
+				
+				map.put("name", search_text);
+				map.put("subject", search_text);
+				map.put("content", search_text);
+				
+			}else if (search.equals("name")) {
+				
+				map.put("name", search_text);
+				
+			}else if (search.equals("subject")) {
+				
+				map.put("subject", search_text);
+				
+			}else if (search.equals("content")) {
+				
+				map.put("content", search_text);
+				
+			}
+			
+		}
 		
 		//전체 게시물 갯수
-		int rowTotal = board_dao.selectRowTotal();
+		int rowTotal = board_dao.selectRowTotal(map);
+		
+		//검색어 내용
+		String search_filter = String.format("search=%s&search_text=%s", search, search_text);
 		
 		//페이징 메뉴 생성
-		String pageMenu = Paging.getPaging("list.do", nowPage, rowTotal, MyConstant.Board.BLOCK_LIST, MyConstant.Board.BLOCK_PAGE);
+		String pageMenu = Paging.getPaging("list.do", search_filter, nowPage, rowTotal, MyConstant.Board.BLOCK_LIST, MyConstant.Board.BLOCK_PAGE);
 		
 		List<BoardVo> list = board_dao.selectList(map);
 		

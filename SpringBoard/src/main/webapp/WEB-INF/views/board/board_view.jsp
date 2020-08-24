@@ -118,7 +118,7 @@ input[type="image"]{border:none;}
 						submit 막는 방법 onclick="return false;"
 						submit 취소를 요청한다.
 						-->
-						<input type="button" class="btn" value="목록" onClick="location.href='list.do?page=${param.page}'; return false;">
+						<input type="button" class="btn" value="목록" onClick="location.href='list.do?page=${param.page}&search=${param.search}&search_text=${search_text}'; return false;">
 						
 						<%--
 							<c:if test="${vo.depth eq 0}">
@@ -127,7 +127,7 @@ input[type="image"]{border:none;}
 							<c:if test="${vo.depth lt 2}"> depth < 2
 							<c:if test="${vo.depth le 2}"> depth <= 2
 						--%>
-						<c:if test="${vo.depth lt 2}">
+						<c:if test="${(vo.depth lt 2) and ((param.search eq 'all') or (empty param.search))}">
 							<input type="button" class="btn" value="댓글" onClick="reply(this.form); return false;"> 
 						</c:if>
 						

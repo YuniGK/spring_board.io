@@ -96,7 +96,7 @@
 				<tr class="btn-box">
 					<td colspan="2">
 						<input type="button" class="btn" onclick="send(this.form);" value="등록">
-						<input type="button" class="btn" onclick="location.href='list.do?page=${param.page}'" value="목록">
+						<input type="button" class="btn" onclick="location.href='list.do?page=${param.page}&search=${param.search}&search_text=${search_text}'" value="목록">
 					</td>
 				</tr>
 			</table>

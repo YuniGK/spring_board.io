@@ -39,6 +39,41 @@
 		location.href="insert_form.do";
 		
 	}
+	
+	/* 검색기능 --------------------------------------------------------- */
+	$(document).ready(function(){
+		/* ajax가 아니기에 페이지가 새롭게 로딩되어 검색어가 사라진다. 
+		   검색어를 uri에서 떼와서 넣어줘야 한다.
+		   
+		   파라미터 값이 없을 경우 전체보기가 나오도록 설정해준다. */
+		$("#search").val("${empty param.search ? 'all' : param.search}");
+		
+		//전체검색 일 시 검색어를 비운다.
+		if ('${param.search}' == "all") {
+			$("#search_text").val("");
+		}
+		
+		//검색 버튼이 눌리면
+		$("#btnFind").click(function () {
+			
+			let search = $("#search").val();
+			let search_text = $("#search_text").val();
+			
+			//검색카테고리가 전체가 아닌데 검색어가 비어있을 경우
+			if (search != 'all' && search_text == '') {
+					alert("검색어를 입력해주세요.");
+					
+					return;
+			}
+						
+			//조회요청
+																	//encodeURIComponent 서버로 내용을 보내기전에 인코딩해서 보낸다.
+			location.href = "list.do?search="+search+"&search_text="+ encodeURIComponent(search_text, "utf-8");
+						   //list.do 생략 가능 - 자기가 자신을 불러왔기에 가능한 부분이다.
+					   
+		});
+		
+	});	
 </script>
 
 <style type="text/css">
@@ -52,6 +87,12 @@
 	.table th.content a{text-align: left; width: 100%; display: inline-block;}
 	
 	.table td.red{color:red;}
+	
+	.form-group{overflow: hidden;}
+	
+	.floatLeft{float: left; width: 30%;}
+	.floatLeft.center{float: left; width: 50%; box-sizing: border-box; padding:0 0 0 10px;}
+	.floatLeft.right{text-align: right; width: 20%;}
 </style>
 
 </head>
@@ -101,12 +142,12 @@
 				<!-- for(BoardVo vo : list) -->
 				<c:forEach var="vo" items="${list}">
 				<tr>
-					<th>${vo.no}</th>
+					<th>${vo.no} (${vo.idx})</th>
 					
 					<!-- 삭제되지 않은 게시물 -->
 					<c:if test="${vo.use_state eq 'y'}">
 						<th class="content">
-							<a href="view.do?idx=${vo.idx}&page=${(empty param.page) ? 1 : param.page}" class="num">
+							<a href="view.do?idx=${vo.idx}&page=${(empty param.page) ? 1 : param.page}&search=${empty param.search ? 'all' : param.search}&search_text=${search_text}" class="num">
 								<!-- 답글이면 들여쓰기 -->
 								<c:forEach begin="0" end="${vo.depth}">
 									&nbsp;
@@ -146,6 +187,31 @@
 						<ul class="pagination">
 							${pageMenu}
 						</ul>
+					</td>
+				</tr>
+				
+				<!-- 검색메뉴 -->
+				<tr>
+					<td colspan="5">
+						<div class="form-group">
+						  <div class="left floatLeft">
+						  	<select class="form-control" id="search">
+							    <option value="all">전체보기</option>
+							    <option value="name">이름</option>
+							    <option value="subject">제목</option>
+							    <option value="content">내용</option>
+							    <option value="name_subject_content">이름 + 제목 + 내용</option>
+							  </select>
+						  </div>
+						  <div class="center floatLeft">
+						  	<!--  ajax가 아니기에 페이지가 새롭게 로딩되어 검색어가 사라진다. 검색어를 uri에서 떼와서 넣어줘야 한다.  -->
+						  	<input type="text" id="search_text" class="form-control" value="${param.search_text}">
+						  </div>
+						  <div class="right floatLeft">
+						  	<input type="button" id="btnFind" class="btn" value="검색">
+						  </div>
+						</div>
+						<!-- //검색메뉴 -->
 					</td>
 				</tr>
 			</tbody>

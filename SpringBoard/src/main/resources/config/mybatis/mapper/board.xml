@@ -14,6 +14,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		select nvl(count(*),0) from board
 	</select>
 	
+	<!-- 전체 / 검색 게시물 수 -->
+	<select id="board_condition_row_total" resultType="int" parameterType="Map">
+		select nvl(count(*),0) from board 
+		<!-- 동적 쿼리 
+			 whrer 다음 or이 오면 or을 삭제한다. -->
+		<trim prefix="where" prefixOverrides="or">
+			<if test="name != null">
+				name like '%' || #{name} || '%'
+			</if>
+			<if test="subject != null">
+				or subject like '%' || #{subject} || '%'
+			</if>
+			<if test="content != null">
+				or content like '%' || #{content} || '%'
+			</if>
+		</trim>
+	</select>
+	
 	<!-- 1건 조회 -->
 	<select id="board_one" resultType="board" parameterType="int">
 		select * from board where idx = #{idx}
@@ -56,13 +74,41 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where idx = #{idx}
 	</update>
 	
-	<!-- 조건별 / 페이징별 목록 조회 -->
+	<!-- 조건별 / 페이징별 목록 조회
 	<select id="board_condition_list" resultType="board" parameterType="Map">
 		select *
 		from
 		(
 			select rank() over(order by ref desc, step asc) no, b.* 
 			from (select * from board) b
+		) 
+		where no between #{start} and #{end} 
+	</select>
+	 -->
+	 
+	<!-- 조건별 / 검색별 / 페이징별 목록 조회 --> 
+	<select id="board_condition_list" resultType="board" parameterType="Map">
+		<!-- ③ -->
+		select *
+		from
+		(
+			<!-- ② -->
+			select rank() over(order by ref desc, step asc) no, b.* 
+			from (
+				<!-- ① -->
+				select * from board
+				<trim prefix="where" prefixOverrides="or">
+					<if test="name != null">
+						name like '%' || #{name} || '%'
+					</if>
+					<if test="subject != null">
+						or subject like '%' || #{subject} || '%'
+					</if>
+					<if test="content != null">
+						or content like '%' || #{content} || '%'
+					</if>
+				</trim>
+			) b
 		) 
 		where no between #{start} and #{end} 
 	</select>
